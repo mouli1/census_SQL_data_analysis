@@ -1,0 +1,77 @@
+Importing the excel file data into SQL using postgreSql
+
+/*create table data3(
+district varchar(60),
+	state varchar(60),
+	area_km2 float8,
+	population float8
+	
+);*/
+create table data4(
+district varchar(60),
+	state varchar(60),
+	growth float8,
+	sex_ratio float8,
+	literacy float8
+	
+);
+
+/*Sum*/
+select sum(population) as population from data3;
+
+/*Average*/
+select avg(growth)*100 avg_growth from data4;
+
+/*Statewise avg growth*/
+select state, avg(growth)*100 as avg_growth from data4 group by state;
+
+/*order from high to low*/
+select state,avg(sex_ratio) as avg_sex_ratio from data4 group by state order by avg_sex_ratio desc; 
+
+/*having by clause used on aggregate and where clause used on row*/
+select state,avg(literacy) as avg_literacy from data4 
+group by state having avg(literacy)>90 order by avg_literacy desc  ; 
+
+/*top 3 states having high sex ratio*/
+select state,avg(sex_ratio) as avg_sex_ratio from data4 
+group by state order by avg_sex_ratio desc limit 3; 
+
+/*bottom 3 states having low avg sex ratio*/
+select state,avg(sex_ratio) as avg_sex_ratio from data4 
+group by state order by avg_sex_ratio asc limit 3; 
+
+/*display top and bottom in literacy by creating temp table*/
+/*topstate table*/
+drop table if exists topstates;
+create  temp table topstates(
+state varchar(60),
+	topstates float
+);
+
+Insert into topstates
+(select state, avg(literacy) as avg_literacy from data4 
+group by state order by avg_literacy desc);
+
+select  * from topstates limit 3;
+/*bottomstate table*/
+drop table if exists bottomstates;
+create  temp table bottomstates(
+state varchar(60),
+	topstates float
+);
+
+Insert into bottomstates
+(select state, avg(literacy) as avg_literacy from data4 
+group by state order by avg_literacy asc);
+
+select  * from bottomstates limit 3;
+
+/*using union operator to show result of both tables together*/
+select * from(select  * from topstates limit 3) a
+union
+select * from(
+select  * from bottomstates limit 3) b;
+
+select distinct state from data4 where state like 'A%';
+
+select distinct state from data4 where state like 'A%' and state like '%m';
